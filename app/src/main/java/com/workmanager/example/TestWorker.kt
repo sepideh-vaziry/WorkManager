@@ -14,6 +14,8 @@ class TestWorker(
     companion object {
         const val KEY_INPUT_TITLE = "title"
         const val KEY_OUTPUT_DATA = "output"
+
+        private const val TAG = "WorkerManagerTag"
     }
 
     //**********************************************************************************************
@@ -21,11 +23,11 @@ class TestWorker(
 
         val title = inputData.getString(KEY_INPUT_TITLE) ?: return Result.failure()
 
-        Log.d("sepideh", "doWork: start= $title")
+        Log.d(TAG, "doWork: start= $title")
 
         Thread.sleep(5000)
 
-        Log.d("sepideh", "doWork: complete = ${Thread.currentThread().name}")
+        Log.d(TAG, "doWork: complete = ${Thread.currentThread().name}")
 
         val outputData = Data.Builder()
             .putString(KEY_OUTPUT_DATA, "output test")

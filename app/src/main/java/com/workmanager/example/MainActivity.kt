@@ -3,16 +3,30 @@ package com.workmanager.example
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
 import androidx.work.*
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
+
+    companion object {
+        private const val TAG = "WorkerManagerTag"
+    }
+
+    private lateinit var mWorkerManager: WorkManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val workerManager = WorkManager.getInstance(this)
+        mWorkerManager = WorkManager.getInstance(this)
 
+        buttonOneTimeWork.setOnClickListener {
+            startOneTimeWork()
+        }
+
+    }
+
+    //**********************************************************************************************
+    private fun startOneTimeWork() {
         val testWorkRequest: WorkRequest =
             OneTimeWorkRequestBuilder<TestWorker>()
                 .setInputData(workDataOf(
@@ -20,16 +34,15 @@ class MainActivity : AppCompatActivity() {
                 ))
                 .build()
 
-        workerManager.enqueue(testWorkRequest)
-        workerManager.getWorkInfoByIdLiveData(testWorkRequest.id)
+        mWorkerManager.enqueue(testWorkRequest)
+        mWorkerManager.getWorkInfoByIdLiveData(testWorkRequest.id)
             .observe(this, { workerInfo ->
 
                 if (workerInfo?.state == WorkInfo.State.SUCCEEDED) {
-                    Log.d("sepideh", "worker output= ${workerInfo.outputData.getString(TestWorker.KEY_OUTPUT_DATA)}")
+                    Log.d(TAG, "worker output= ${workerInfo.outputData.getString(TestWorker.KEY_OUTPUT_DATA)}")
                 }
 
             })
-
     }
 
 }
