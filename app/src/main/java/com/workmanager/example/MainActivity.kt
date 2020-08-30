@@ -16,19 +16,23 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
 
-        mWorkerManager = WorkManager.getInstance(this)
+        mWorkerManager = WorkManager.getInstance(applicationContext)
 
         buttonOneTimeWork.setOnClickListener {
             startOneTimeWork()
+        }
+
+        buttonProgressWorker.setOnClickListener {
+            startProgressWorker()
         }
 
     }
 
     //**********************************************************************************************
     private fun startOneTimeWork() {
-        val testWorkRequest: WorkRequest =
-            OneTimeWorkRequestBuilder<TestWorker>()
+        val testWorkRequest: WorkRequest = OneTimeWorkRequestBuilder<TestWorker>()
                 .setInputData(workDataOf(
                     TestWorker.KEY_INPUT_TITLE to "Test Title"
                 ))
@@ -36,10 +40,36 @@ class MainActivity : AppCompatActivity() {
 
         mWorkerManager.enqueue(testWorkRequest)
         mWorkerManager.getWorkInfoByIdLiveData(testWorkRequest.id)
-            .observe(this, { workerInfo ->
+            .observe(this, { workInfo: WorkInfo? ->
+                if (workInfo?.state == WorkInfo.State.SUCCEEDED) {
+                    Log.d(TAG, "worker output= ${workInfo.outputData.getString(TestWorker.KEY_OUTPUT_DATA)}")
+                }
+            })
+    }
 
-                if (workerInfo?.state == WorkInfo.State.SUCCEEDED) {
-                    Log.d(TAG, "worker output= ${workerInfo.outputData.getString(TestWorker.KEY_OUTPUT_DATA)}")
+    //**********************************************************************************************
+    private fun startProgressWorker() {
+        val progressWorker: WorkRequest = OneTimeWorkRequestBuilder<ProgressWorker>()
+                .build()
+
+        mWorkerManager.enqueue(progressWorker)
+
+        mWorkerManager.getWorkInfoByIdLiveData(progressWorker.id)
+            .observe(this, { workInfo: WorkInfo? ->
+
+                workInfo?.let {
+
+                    if (it.state == WorkInfo.State.SUCCEEDED) {
+                        val progress = workInfo.outputData.getInt(ProgressWorker.PROGRESS, 0)
+                        Log.d(TAG, "status= ${workInfo.state} - progress is: $progress")
+                    }
+                    else {
+                        val progress = it.progress
+                        val progressValue = progress.getInt(ProgressWorker.PROGRESS, -1)
+
+                        Log.d(TAG, "status= ${workInfo.state} - progress is: $progressValue")
+                    }
+
                 }
 
             })

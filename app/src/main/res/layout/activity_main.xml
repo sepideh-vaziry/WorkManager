@@ -9,6 +9,16 @@
         android:id="@+id/buttonOneTimeWork"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
         android:text="Start OneTimeWork" />
+
+    <Button
+        android:id="@+id/buttonProgressWorker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/buttonOneTimeWork"
+        android:text="Start ProgressWorker (CoroutineWorker)" />
 
 </RelativeLayout>
