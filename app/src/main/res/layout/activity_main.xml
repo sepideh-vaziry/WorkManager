@@ -21,4 +21,13 @@
         android:layout_below="@+id/buttonOneTimeWork"
         android:text="Start ProgressWorker (CoroutineWorker)" />
 
+    <Button
+        android:id="@+id/buttonPeriodicWork"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/buttonProgressWorker"
+        android:text="Start PeriodicWork" />
+
 </RelativeLayout>

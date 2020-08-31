@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.work.*
 import kotlinx.android.synthetic.main.activity_main.*
+import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
 
@@ -26,6 +27,10 @@ class MainActivity : AppCompatActivity() {
 
         buttonProgressWorker.setOnClickListener {
             startProgressWorker()
+        }
+
+        buttonPeriodicWork.setOnClickListener {
+            startPeriodicWork()
         }
 
     }
@@ -61,7 +66,7 @@ class MainActivity : AppCompatActivity() {
 
                     if (it.state == WorkInfo.State.SUCCEEDED) {
                         val progress = workInfo.outputData.getInt(ProgressWorker.PROGRESS, 0)
-                        Log.d(TAG, "status= ${workInfo.state} - progress is: $progress")
+                        Log.d(TAG, "status= ${workInfo.state} - progress is: $progress  ")
                     }
                     else {
                         val progress = it.progress
@@ -72,6 +77,23 @@ class MainActivity : AppCompatActivity() {
 
                 }
 
+            })
+    }
+
+    //**********************************************************************************************
+    private fun startPeriodicWork() {
+        val testWorkRequest: WorkRequest = PeriodicWorkRequestBuilder<TestWorker>(
+            15, TimeUnit.MINUTES
+        ).setInputData(workDataOf(
+            TestWorker.KEY_INPUT_TITLE to "Test Title"
+        )).build()
+
+        mWorkerManager.enqueue(testWorkRequest)
+        mWorkerManager.getWorkInfoByIdLiveData(testWorkRequest.id)
+            .observe(this, { workInfo: WorkInfo? ->
+                if (workInfo?.state == WorkInfo.State.SUCCEEDED) {
+                    Log.d(TAG, "worker output= ${workInfo.outputData.getString(TestWorker.KEY_OUTPUT_DATA)}")
+                }
             })
     }
 
